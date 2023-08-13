@@ -57,7 +57,7 @@ def get_block(size):
 class Player(pygame.sprite.Sprite):
     COLOR = (255, 0, 0)
     GRAVITY = 1
-    SPRITES = load_sprite_sheets("MainCharacters", "NinjaFrog", 32, 32, True)
+    SPRITES = load_sprite_sheets("MainCharacters", "MaskDude", 32, 32, True)
     ANIMATION_DELAY = 3
 
     def __init__(self, x, y, width, height):
@@ -108,16 +108,16 @@ class Player(pygame.sprite.Sprite):
 
     def hit_head(self):
         self.count = 0
-        self.y_vel += -1
+        self.y_vel *= -1
 
     def update_sprite(self):
         sprite_sheet = "idle"
-        if self.y_vel != 0:
+        if self.y_vel < 0:
             if self.jump_count == 1:
                 sprite_sheet = "jump"
             elif self.jump_count == 2:
                 sprite_sheet = "double_jump"
-        elif self.y_vel > 0:
+        elif self.y_vel > self.GRAVITY * 2:
             sprite_sheet = "fall"
         elif self.x_vel != 0:
             sprite_sheet = "run"
@@ -221,6 +221,9 @@ def main(window):
     floor = [Block(i * block_size, HEIGHT - block_size, block_size)
              for i in range(-WIDTH // block_size, WIDTH * 2 // block_size)]
 
+    offset_x = 0
+    scroll_area_width = 200
+
     run = True
     while run:
         clock.tick(FPS)
@@ -237,6 +240,10 @@ def main(window):
         player.loop(FPS)
         handle_move(player, floor)
         draw(window, background, bg_image, player, floor)
+
+        # if ((player.rect.right - offset_x >= WIDTH - scroll_area_width) and player.x_vel > 0) or (
+        #         (player.rect.left - offset_x <= scroll_area_width) and player.x_vel < 0):
+        #     offset_x += player.x_vel
 
     pygame.quit()
     quit()
